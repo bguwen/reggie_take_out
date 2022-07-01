@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.User;
 import com.itheima.reggie.service.UserService;
@@ -107,6 +108,17 @@ public class UserController {
         return R.error("登录失败！");
     }
 
+    /**
+     * 退出功能
+     * @param request request
+     * @return R
+     */
+    @PostMapping
+    public R<String> logout(HttpServletRequest request){
+        request.getSession().removeAttribute("user");
+        BaseContext.remove();
+        return R.success("退出登录成功!");
+    }
     /**
      * 手机验证码
      *
