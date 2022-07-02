@@ -112,5 +112,14 @@ public class SetMealController {
         return setmealList.size() != 0 ? R.success(setmealList) : R.error("暂无数据");
     }
 
-
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> getById(@PathVariable Long id){
+        SetmealDto setmealDto = setmealService.getByIdWithDish(id);
+        return R.success(setmealDto);
+}
 }

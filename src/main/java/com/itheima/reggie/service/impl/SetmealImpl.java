@@ -9,6 +9,7 @@ import com.itheima.reggie.entity.SetmealDish;
 import com.itheima.reggie.mapper.SetmealMapper;
 import com.itheima.reggie.service.SetMealDishService;
 import com.itheima.reggie.service.SetmealService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,5 +62,21 @@ public class SetmealImpl extends ServiceImpl<SetmealMapper, Setmeal> implements 
         LambdaQueryWrapper<SetmealDish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         dishLambdaQueryWrapper.eq(SetmealDish::getDishId, ids);
         setMealDishService.remove(dishLambdaQueryWrapper);
+    }
+
+    @Override
+    public SetmealDto getByIdWithDish(Long id) {
+        //查询套餐基本信息，从setmeal表上查
+        Setmeal setmeal = this.getById(id);
+        //查询当前套餐对应的菜品信息，从setmeal_dish表上查
+        LambdaQueryWrapper<SetmealDish> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(id != null, SetmealDish::getSetmealId, id);
+        List<SetmealDish> setmealDishList = setMealDishService.list(queryWrapper);
+        SetmealDto setmealDto = new SetmealDto();
+//开始拷贝
+        BeanUtils.copyProperties(setmeal, setmealDto);
+//        设置对应的菜品信息
+        setmealDto.setSetmealDishes(setmealDishList);
+        return setmealDto;
     }
 }
