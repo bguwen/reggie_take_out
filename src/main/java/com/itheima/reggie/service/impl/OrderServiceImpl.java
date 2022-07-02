@@ -2,17 +2,22 @@ package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.CustomException;
+import com.itheima.reggie.dto.OrdersDto;
 import com.itheima.reggie.entity.*;
 import com.itheima.reggie.mapper.OrderMapper;
 import com.itheima.reggie.service.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -29,9 +34,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     private AddressBookService addressBookService;
     @Autowired
     private OrderDetailService orderDetailService;
+    @Autowired
+    private OrdersDtoService ordersDtoService;
 
     /**
      * 用户下单
+     *
      * @param orders orders
      */
     @Override
@@ -88,5 +96,38 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
         orderDetailService.saveBatch(list);
 //        清空购物车
         shoppingCartService.remove(queryWrapper);
+    }
+
+    @Override
+    public Page<OrdersDto> myPage(int page, int pageSize, String number, String beginTime, String endTime) {
+        LocalDateTime beginDateTime = null;
+        LocalDateTime endDateTime = null;
+//        解析时间
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (beginTime != null && !"".equals(beginTime)) {
+            beginDateTime = LocalDateTime.parse(beginTime, pattern);
+        }
+        if (endTime != null && !"".equals(endTime)) {
+            endDateTime = LocalDateTime.parse(endTime, pattern);
+        }
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+        Page<OrdersDto> ordersDtoPage = new Page<>(page, pageSize);
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(number != null, Orders::getNumber, number);
+        queryWrapper.ge(beginDateTime != null, Orders::getOrderTime, beginDateTime);
+        queryWrapper.le(endDateTime != null, Orders::getOrderTime, endDateTime);
+
+        Page<Orders> ordersPage1 = this.page(ordersPage, queryWrapper);
+
+        List<OrdersDto> ordersDtoList = ordersPage1.getRecords().stream().map(item -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item,ordersDto);
+            Long userId = item.getUserId();
+            User user = userService.getById(userId);
+            ordersDto.setUserName(user.getName());
+            return ordersDto;
+        }).collect(Collectors.toList());
+        ordersDtoPage.setRecords(ordersDtoList);
+        return ordersDtoPage;
     }
 }
