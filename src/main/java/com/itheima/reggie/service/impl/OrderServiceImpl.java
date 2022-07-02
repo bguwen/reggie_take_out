@@ -121,13 +121,43 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
         List<OrdersDto> ordersDtoList = ordersPage1.getRecords().stream().map(item -> {
             OrdersDto ordersDto = new OrdersDto();
-            BeanUtils.copyProperties(item,ordersDto);
+            BeanUtils.copyProperties(item, ordersDto);
             Long userId = item.getUserId();
             User user = userService.getById(userId);
             ordersDto.setUserName(user.getName());
             return ordersDto;
         }).collect(Collectors.toList());
         ordersDtoPage.setRecords(ordersDtoList);
+        return ordersDtoPage;
+    }
+
+    @Transactional
+    @Override
+    public Page<OrdersDto> userPage(int page, int pageSize) {
+        Long currentId = BaseContext.getCurrentId();
+        if (currentId == null) {
+            return null;
+        }
+        Page<Orders> pageInfo = new Page<>(page, pageSize);
+
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(currentId != null, Orders::getUserId, currentId);
+        Page<Orders> ordersPage = this.page(pageInfo, queryWrapper);
+
+        List<OrdersDto> collect = ordersPage.getRecords().stream().map(item -> {
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(item, ordersDto);
+            LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.eq(item.getId() != null, OrderDetail::getOrderId, item.getId());
+            List<OrderDetail> list = orderDetailService.list(lambdaQueryWrapper);
+
+            ordersDto.setOrderDetails(list);
+            return ordersDto;
+        }).collect(Collectors.toList());
+
+        Page<OrdersDto> ordersDtoPage = new Page<>();
+        ordersDtoPage.setRecords(collect);
         return ordersDtoPage;
     }
 }

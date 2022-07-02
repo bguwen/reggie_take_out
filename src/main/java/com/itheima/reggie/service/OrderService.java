@@ -18,6 +18,7 @@ public interface OrderService extends IService<Orders> {
 
     /**
      * 管理端订单分页查询
+     *
      * @param page
      * @param pageSize
      * @param number
@@ -26,4 +27,13 @@ public interface OrderService extends IService<Orders> {
      * @return
      */
     Page<OrdersDto> myPage(int page, int pageSize, String number, String beginTime, String endTime);
+
+    /**
+     * 用户端订单分页查询
+     *
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    Page<OrdersDto> userPage(int page, int pageSize);
 }
