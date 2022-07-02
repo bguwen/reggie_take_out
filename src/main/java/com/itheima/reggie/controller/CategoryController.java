@@ -50,6 +50,8 @@ public class CategoryController {
         Page<Category> pageInfo = new Page<>(page, pageSize);
 //        条件构造器
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+//        是否已删除
+        queryWrapper.eq(Category::getIsDeleted, 0);
 //        添加排序条件
         queryWrapper.orderByAsc(Category::getSort);
 //        执行查询
@@ -60,15 +62,22 @@ public class CategoryController {
     /**
      * 根据id删除分类
      *
-     * @param id id
+     * @param ids ids
      * @return R
      */
     @DeleteMapping
-    public R<String> delete(Long id) {
+    public R<String> delete(Long ids) {
 //        log.info("根据id分类id{}",id);
+        if (ids == null) {
+            return R.error("删除失败！");
+        }
 //      删除分类
-        categoryService.remove(id);
-        return R.success("分类信息删除成功！");
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Category::getId, ids);
+        Category category = categoryService.getOne(queryWrapper);
+        category.setIsDeleted(1);
+        boolean flag = categoryService.updateById(category);
+        return flag ? R.success("分类信息删除成功！") : R.error("删除失败！");
     }
 
     /**
@@ -94,7 +103,7 @@ public class CategoryController {
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
         queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
-
+        category.setIsDeleted(1);
         List<Category> list = categoryService.list(queryWrapper);
         return R.success(list);
     }

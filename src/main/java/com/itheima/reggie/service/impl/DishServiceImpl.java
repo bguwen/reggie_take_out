@@ -108,13 +108,17 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Transactional
     public void deleteByIdWithFlavor(Long[] ids) {
 
-        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
         for (Long id : ids) {
+            LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+
             //        删除dish表基本信息
             dishLambdaQueryWrapper.eq(id != null, Dish::getId, id);
             Dish dish = this.getOne(dishLambdaQueryWrapper);
-            dish.setIsDeleted(1);
-            this.updateById(dish);
+            if (dish!=null){
+                dish.setIsDeleted(1);
+                this.updateById(dish);
+            }
+
 //            this.remove(dishLambdaQueryWrapper);
             //        清除口味数据，--dish_flavor
 

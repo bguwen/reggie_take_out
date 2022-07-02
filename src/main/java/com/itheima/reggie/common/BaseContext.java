@@ -4,7 +4,7 @@ package com.itheima.reggie.common;
  * 基于ThreadLocal封装工具类
  */
 public class BaseContext {
-    private static  ThreadLocal<Long> threadLocal=new ThreadLocal<>();
+    private static final ThreadLocal<Long> threadLocal=new ThreadLocal<>();
 
     public static void setCurrentId(Long id){
         threadLocal.set(id);

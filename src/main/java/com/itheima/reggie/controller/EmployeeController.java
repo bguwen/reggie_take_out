@@ -2,6 +2,7 @@ package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.EmployeeService;
@@ -70,6 +71,7 @@ public class EmployeeController {
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request) {
         request.getSession().removeAttribute("employee");
+        BaseContext.remove();
         return R.success("退出成功！");
     }
 
@@ -105,9 +107,10 @@ public class EmployeeController {
 
     /**
      * 分页查询
-     * @param page page
+     *
+     * @param page     page
      * @param pageSize pageSize
-     * @param name name
+     * @param name     name
      * @return R
      */
     @GetMapping("/page")
@@ -136,10 +139,8 @@ public class EmployeeController {
      */
     @PutMapping
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
-        log.info("-------------------" + employee.toString() + "-------------------");
-//        employee.setUpdateUser((Long) request.getSession().getAttribute("employee"));
-//        employee.setUpdateTime(LocalDateTime.now());
-//        employeeService.updateById(employee);
+//        log.info("-------------------" + employee.toString() + "-------------------");
+        employeeService.updateById(employee);
         return R.success("账号信息更新成功！");
     }
 
@@ -152,7 +153,7 @@ public class EmployeeController {
     @GetMapping({"/{id}"})
     public R<Employee> getById(@PathVariable Long id) {
 
-        log.info("根据id查询员工信息！{}",id);
+        log.info("根据id查询员工信息！{}", id);
 
         Employee employee = employeeService.getById(id);
         if (employee != null) {
