@@ -3,6 +3,7 @@ package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.SetmealDto;
@@ -42,7 +43,7 @@ public class SetMealController {
      * @param setmealDto setmealDto
      * @return R
      */
-    @CacheEvict(value = "setmealCache",allEntries = true) //删除缓存数据
+    @CacheEvict(value = "setmealCache", allEntries = true) //删除缓存数据
     @PostMapping
     public R<String> save(@RequestBody SetmealDto setmealDto) {
         setmealService.saveWithDish(setmealDto);
@@ -89,7 +90,7 @@ public class SetMealController {
      * @param ids ids
      * @return R
      */
-    @CacheEvict(value = "setmealCache",allEntries = true) //删除缓存数据
+    @CacheEvict(value = "setmealCache", allEntries = true) //删除缓存数据
     @DeleteMapping
     public R<String> delete(@RequestParam List<Long> ids) {
         setmealService.removeWithDish(ids);
@@ -98,6 +99,7 @@ public class SetMealController {
 
     /**
      * 根据条件查询套餐数据
+     *
      * @param setmeal setmeal
      * @return R
      */
@@ -114,12 +116,37 @@ public class SetMealController {
 
     /**
      * 根据id查询
+     *
      * @param id
      * @return
      */
     @GetMapping("/{id}")
-    public R<SetmealDto> getById(@PathVariable Long id){
+    public R<SetmealDto> getById(@PathVariable Long id) {
         SetmealDto setmealDto = setmealService.getByIdWithDish(id);
         return R.success(setmealDto);
-}
+    }
+
+    /**
+     * 修改套餐同时修改套餐和菜品关联关系
+     * @param setmealDto
+     * @return
+     */
+    @CacheEvict(value = "setmealCache", allEntries = true) //删除缓存数据
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
+        boolean flag = setmealService.updateWithDish(setmealDto);
+        return flag?R.success("修改成功！"):R.error("修改失败！");
+    }
+
+    @PostMapping("/status/{status}")
+    public R<String> updateStatus(@PathVariable  int status ,Long[] ids){
+
+        if (ids==null||ids.length==0){
+            return R.error("参数有误！");
+        }
+        LambdaUpdateWrapper<Setmeal> updateWrapper=new LambdaUpdateWrapper<>();
+        updateWrapper.set(Setmeal::getStatus,status).in(Setmeal::getId, (Object[]) ids);
+        boolean flag = setmealService.update(updateWrapper);
+        return flag?R.success("状态修改成功！"):R.error("状态修改失败！");
+    }
 }

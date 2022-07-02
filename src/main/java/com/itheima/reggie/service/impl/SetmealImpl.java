@@ -2,6 +2,7 @@ package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.CustomException;
 import com.itheima.reggie.dto.SetmealDto;
 import com.itheima.reggie.entity.Setmeal;
@@ -78,5 +79,24 @@ public class SetmealImpl extends ServiceImpl<SetmealMapper, Setmeal> implements 
 //        设置对应的菜品信息
         setmealDto.setSetmealDishes(setmealDishList);
         return setmealDto;
+    }
+
+    /**
+     * 修改套餐同时修改套餐和菜品关联关系
+     *
+     * @param setmealDto setmealDto
+     * @return
+     */
+    @Transactional
+    @Override
+    public boolean updateWithDish(SetmealDto setmealDto) {
+        setmealDto.setUpdateUser(BaseContext.getCurrentId());
+        boolean flag1 = this.updateById(setmealDto);
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes().stream().map(item->{
+            item.setUpdateUser(BaseContext.getCurrentId());
+            return item;
+        }).collect(Collectors.toList());
+        boolean flag2 = setMealDishService.updateBatchById(setmealDishes);
+return flag1&&flag2;
     }
 }

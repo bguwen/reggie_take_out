@@ -26,4 +26,11 @@ public interface SetmealService extends IService<Setmeal> {
      * @return R
      */
     SetmealDto getByIdWithDish(Long id);
+    /**
+     * 修改套餐同时修改套餐和菜品关联关系
+     *
+     * @param setmealDto setmealDto
+     * @return
+     */
+    boolean updateWithDish(SetmealDto setmealDto);
 }
