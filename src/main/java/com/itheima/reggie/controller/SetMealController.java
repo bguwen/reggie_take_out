@@ -103,7 +103,7 @@ public class SetMealController {
      * @param setmeal setmeal
      * @return R
      */
-    @Cacheable(value = "setmealCache", key = "#setmeal.getCategoryId()+'_'+#setmeal.getCategoryId()") //缓存注解
+    @Cacheable(value = "setmealCache", key = "#setmeal.getCategoryId+'_'+#setmeal.getStatus") //缓存注解
     @GetMapping("/list")
     public R<List<Setmeal>> list(Setmeal setmeal) {
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
@@ -138,6 +138,7 @@ public class SetMealController {
         return flag?R.success("修改成功！"):R.error("修改失败！");
     }
 
+    @CacheEvict(value = "setmealCache", allEntries = true) //删除缓存数据
     @PostMapping("/status/{status}")
     public R<String> updateStatus(@PathVariable  int status ,Long[] ids){
 
