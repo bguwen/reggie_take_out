@@ -81,4 +81,5 @@ mybatis-plus:
       id-type: ASSIGN_ID
 reggie:
 #  path: /usr/local/app/images/
-  path: D:\桌面\Java文件\com.itheima\瑞吉外卖\1 瑞吉外卖项目\1 瑞吉外卖项目\资料\图片资源\
+  #  path: D:\桌面\Java文件\com.itheima\瑞吉外卖\1 瑞吉外卖项目\1 瑞吉外卖项目\资料\图片资源\
+  path: src/main/resources/imgs/
