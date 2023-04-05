@@ -122,36 +122,36 @@
               //   id: '1',
               //   name: '门店管理',
               //   children: [
-                  {
-                    id: '2',
-                    name: '员工管理',
-                    url: 'page/member/list.html',
-                    icon: 'icon-member'
-                  },
-                  {
-                    id: '3',
-                    name: '分类管理',
-                    url: 'page/category/list.html',
-                    icon: 'icon-category'
-                  },
-                  {
-                    id: '4',
-                    name: '菜品管理',
-                    url: 'page/food/list.html',
-                    icon: 'icon-food'
-                  },
-                  {
-                    id: '5',
-                    name: '套餐管理',
-                    url: 'page/combo/list.html',
-                    icon: 'icon-combo'
-                  },
-                  {
-                    id: '6',
-                    name: '订单明细',
-                    url: 'page/order/list.html',
-                    icon: 'icon-order'
-                  }
+              //     {
+              //       id: '2',
+              //       name: '员工管理',
+              //       url: 'page/member/list.html',
+              //       icon: 'icon-member'
+              //     },
+              //     {
+              //       id: '3',
+              //       name: '分类管理',
+              //       url: 'page/category/list.html',
+              //       icon: 'icon-category'
+              //     },
+              //     {
+              //       id: '4',
+              //       name: '菜品管理',
+              //       url: 'page/food/list.html',
+              //       icon: 'icon-food'
+              //     },
+              //     {
+              //       id: '5',
+              //       name: '套餐管理',
+              //       url: 'page/combo/list.html',
+              //       icon: 'icon-combo'
+              //     },
+              //     {
+              //       id: '6',
+              //       name: '订单明细',
+              //       url: 'page/order/list.html',
+              //       icon: 'icon-order'
+              //     }
               //   ],
               // },
             ],
@@ -164,6 +164,7 @@
         },
         computed: {},
         created() {
+          this.getMenuList()
           const userInfo = window.localStorage.getItem('userInfo')
           if (userInfo) {
             this.userInfo = JSON.parse(userInfo)
@@ -178,6 +179,18 @@
           window.menuHandle = this.menuHandle
         },
         methods: {
+
+          getMenuList(){
+            $axios({
+              url: '/getMenuList',
+              method: 'get',
+            }).then(response =>{
+              if(response.code === 1){
+                this.menuList=response.data
+              }
+            })
+          },
+
           logout() {
             logoutApi().then((res)=>{
               if(res.code === 1){
