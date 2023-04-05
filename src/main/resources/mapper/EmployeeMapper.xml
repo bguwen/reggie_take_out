@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hngc.mapper.EmployeeMapper">
+    <select id="getPermission" resultType="java.lang.String">
+
+        SELECT `permission`.`permission` AS `permission`
+        FROM ((((
+            `employee`
+                JOIN `role_employee` ON ((
+                `employee`.`id` = `role_employee`.`employee_id`
+                )))
+            JOIN `role` ON ((
+            `role_employee`.`role_id` = `role`.`id`
+            )))
+            JOIN `role_permission` ON ((
+            `role`.`id` = `role_permission`.`role_id`
+            )))
+            JOIN `permission` ON ((
+            `role_permission`.`permission_id` = `permission`.`id`
+            )))
+        WHERE (
+                  `employee`.`id` = #{id})
+
+    </select>
+</mapper>

@@ -65,7 +65,7 @@
         return {
           loginForm:{
             username: 'admin',
-            password: '123456'
+            password: 'admin'
           },
           loading: false
         }
@@ -80,7 +80,7 @@
             }
           }
           const validatePassword = (rule, value, callback) => {
-            if (value.length < 6) {
+            if (value.length < 5) {
               callback(new Error('密码必须在6位以上'))
             } else {
               callback()
@@ -101,7 +101,8 @@
               this.loading = true
               let res = await loginApi(this.loginForm)
               if (String(res.code) === '1') {
-                localStorage.setItem('userInfo',JSON.stringify(res.data))
+                localStorage.setItem('userInfo',JSON.stringify(res.data.userInfo))
+                localStorage.setItem('token',res.data.token)
                 window.location.href= '/backend/index.html'
               } else {
                 this.$message.error(res.msg)
